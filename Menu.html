@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flipbook Interativo</title>
+<!-- Carregamos jQuery e Turn.js a partir do JSDelivr (confiável). 
+     Se precisares de versão totalmente offline, descarrega estes ficheiros 
+     e coloca‑os na mesma pasta, substituindo os &lt;script src=...&gt; por 
+     &lt;script src="jquery.min.js"&gt;&lt;/script&gt; e &lt;script src="turn.min.js"&gt;&lt;/script&gt;. -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/turn.js@4/turn.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background:#222;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    margin:0;
+  }
+  #container {
+    position:relative;
+    width:800px;
+    height:1131px;
+  }
+  #flipbook {
+    width:100%;
+    height:100%;
+  }
+  #flipbook .page {
+    width:100%;
+    height:100%;
+  }
+  #flipbook img {
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+  }
+  /* Áreas clicáveis */
+  .zone {
+    position:absolute;
+    top:0;
+    width:50%;
+    height:100%;
+    z-index:1000;          /* acima das páginas */
+    cursor:pointer;
+  }
+  #prevZone { left:0; }
+  #nextZone { right:0; }
+  /* Setas */
+  .zone::after {
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:80px;
+    font-weight:bold;
+    font-family:Arial, sans-serif;
+    color:rgba(255,255,255,0.8);
+    text-shadow:0 0 15px rgba(0,0,0,0.6);
+    pointer-events:none;
+    user-select:none;
+    opacity:0;
+    transition:opacity .2s;
+  }
+  #prevZone::after { content:'\276E'; left:25px; }
+  #nextZone::after { content:'\276F'; right:25px; }
+  .zone:hover::after { opacity:1; } /* aparece só ao passar o rato/tocar */
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="prevZone" class="zone"></div>
+  <div id="nextZone" class="zone"></div>
+  <div id="flipbook">
+    <div class="page"><img src="01Menu Cover page - Apr.png" alt=""></div>
+    <div class="page"><img src="02 THAILANDER's special.png" alt=""></div>
+    <div class="page"><img src="03 Menu page1.png" alt=""></div>
+    <div class="page"><img src="04 Menu page2.png" alt=""></div>
+    <div class="page"><img src="05 Menu page 3.png" alt=""></div>
+    <div class="page"><img src="06Menu page 4.png" alt=""></div>
+    <div class="page"><img src="07 Menu page 5.png" alt=""></div>
+    <div class="page"><img src="08 Menu page 6.png" alt=""></div>
+  </div>
+</div>
+<script>
+  $(function() {
+    /* Inicializamos o flipbook depois de todas as imagens carregarem */
+    const initFlip = function() {
+      $("#flipbook").turn({
+        width: 800,
+        height: 1131,
+        autoCenter: true,
+        display: 'single',
+        elevation: 50,
+        gradients: true
+      });
+    };
+
+    /* Espera pelas imagens */
+    const imgs = $("#flipbook img");
+    let loaded = 0;
+    imgs.each(function() {
+      if (this.complete) {
+        if (++loaded === imgs.length) initFlip();
+      } else {
+        $(this).one('load', function() {
+          if (++loaded === imgs.length) initFlip();
+        });
+      }
+    });
+
+    /* Controlo de navegação */
+    $("#nextZone").on("click touchstart", function(e) { e.preventDefault(); $("#flipbook").turn('next'); });
+    $("#prevZone").on("click touchstart", function(e) { e.preventDefault(); $("#flipbook").turn('previous'); });
+  });
+</script>
+</body>
+</html>
